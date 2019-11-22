@@ -3,10 +3,8 @@ const fs = require("fs");
 const PDFDocument = require("pdfkit");
 const express = require('express');
 const bodyParser = require("body-parser");
-const mongoose = require('mongoose');
 let app = express();
 
-mongoose.connect('mongodb://localhost:27017/invoice', { useNewUrlParser: true });
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ useNewUrlParser: true }));
 app.use(bodyParser.json());
@@ -27,14 +25,12 @@ function createInvoice(invoice, path) {
 }
 
 function generateLogo(doc) {
-    doc
-        .image("/home/parangat-pt-p10/Desktop/logo.png", 500, 20, { width: 70 }, { align: "right" });
+    doc.image("/home/parangat-pt-p10/Desktop/logo.png", 500, 20, { width: 70 }, { align: "right" });  // logo image location
     return doc;
 }
 
 function generateHeader(doc, invoice) {
-    doc
-        .fontSize(20)
+    doc.fontSize(20)
         .text("INVOICE", 60, 75)
         .fontSize(10)
         .text("Invoice ID: ", 364, 70)
@@ -206,7 +202,6 @@ function generateTableRow(
     return doc;
 }
 
-//-----------------------------------------
 function generateMethodTableRow(
     doc,
     y,
@@ -221,7 +216,7 @@ function generateMethodTableRow(
         .text(shipping_charges, 410, y);
     return doc;
 }
-//-----------------------------------------
+
 function generateHr(doc, y) {
     doc
         .strokeColor("#aaaaaa")
@@ -238,7 +233,8 @@ function formatCurrency(cents) {
 
 // post api
 app.post("/data", (req, res) => {
-    let invoicedata = createInvoice(req.body, "/home/parangat-pt-p10/Downloads/invoice.pdf");
+    let name = 'invoice' + new Date().getTime();   // to generate dynamic names for pdf file
+    let invoicedata = createInvoice(req.body, `/home/parangat-pt-p10/Desktop/Invoice mail/${name}.pdf`);  // location where pdf generated file will get saved.
     if (!invoicedata) throw Error;
     res.send(invoicedata);
 });
